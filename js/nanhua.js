@@ -3201,7 +3201,7 @@ self=window;
     //r = a.O(r)
 }
 )();
-function jiami(msgid) {
+function jiami(msgid,seq) {
     var M = window.guan_(3504);
     const E = M.Reader
       , w = M.Writer
@@ -5641,19 +5641,19 @@ function jiami(msgid) {
 	if (msgid == 66) {
     var s = {
         "msgid": msgid,
-        "seq": 1,
+        "seq": seq,
         "jsonReq": "{}"
     };
 } else if (msgid == 64) {
     var s = {
         "msgid": msgid,
-        "seq": 2,
+        "seq": seq,
         "jsonReq": "{}"
     };
 } else if (msgid == 32) {
     var s = {
         "msgid": msgid,
-        "seq": 0,
+        "seq": seq,
         "request": {
             "auth": {
                 "apptype": "nhwebquo",
@@ -5672,10 +5672,18 @@ function jiami(msgid) {
         },
         "jsonReq": null
     };
+} else if (msgid == 16) {
+    var s = {
+        "msgid": msgid,
+        "seq": seq,
+		"request" :{},
+        "jsonReq": null
+    };
 }
 
     var h = _.create(s);
     var l = _.encode(h).finish();
+	
     return l
 }
 function token(time) {

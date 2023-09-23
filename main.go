@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 )
 
 func main() {
@@ -32,11 +33,12 @@ func main() {
 		defer close(done)
 		for {
 			_, message, err := c.ReadMessage()
-			mesDecode := js.Decode(message)
+
 			if err != nil {
-				log.Println("读取消息错误：", err)
+				log.Println("读取消息错误：", err, message)
 				return
 			}
+			mesDecode := js.Decode(message)
 			fmt.Printf("收到消息：%s\n", mesDecode)
 
 		}
@@ -53,6 +55,23 @@ func main() {
 	data, _ = js.Encode(18)
 	c.WriteMessage(websocket.BinaryMessage, data)
 	//fmt.Println([]byte(v))
+
+	ticker10 := time.Tick(10 * time.Second) // 创建一个每隔10秒触发的Ticker
+	ticker20 := time.Tick(20 * time.Second) // 创建一个每隔10秒触发的Ticker
+	for {
+		select {
+		case <-ticker10:
+			data, _ = js.Encode(16)
+			c.WriteMessage(websocket.BinaryMessage, data)
+
+		}
+		select {
+		case <-ticker20:
+			data, _ = js.Encode(32)
+			c.WriteMessage(websocket.BinaryMessage, data)
+
+		}
+	}
 	for {
 		select {
 		case <-done:

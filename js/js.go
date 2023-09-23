@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"github.com/dop251/goja"
 	"os"
+	"sync/atomic"
 )
 
 type Jsjiami struct {
 	jsFile []byte
 	Js     *goja.Runtime
+	seq    int64
 }
 type Auth struct {
 	Apptype string  `json:"apptype"`
@@ -25,6 +27,7 @@ func NewJsjiami(File string) *Jsjiami {
 	return &Jsjiami{
 		jsFile: F,
 		Js:     goja.New(),
+		seq:    0,
 	}
 }
 func (j *Jsjiami) Decode(data []uint8) string {
@@ -49,12 +52,15 @@ func (j *Jsjiami) Encode(msgid int) ([]uint8, error) {
 		return make([]uint8, 0), err
 	}
 
-	var Encode func(int) []uint8
+	var Encode func(int, int64) []uint8
 	err = j.Js.ExportTo(j.Js.Get("jiami"), &Encode)
 	if err != nil {
 		panic("Not a function")
 	}
 
-	return Encode(msgid), nil
+	atomic.AddInt64(&j.seq, 1)
+	uint8 := Encode(msgid, j.seq)
+	//fmt.Println(msgid, uint8)
+	return uint8, nil
 
 }
