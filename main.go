@@ -58,20 +58,23 @@ func main() {
 
 	ticker10 := time.Tick(10 * time.Second) // 创建一个每隔10秒触发的Ticker
 	ticker20 := time.Tick(20 * time.Second) // 创建一个每隔10秒触发的Ticker
-	for {
-		select {
-		case <-ticker10:
-			data, _ = js.Encode(16)
-			c.WriteMessage(websocket.BinaryMessage, data)
+	go func() {                             //心跳包
+		for {
+			select {
+			case <-ticker10:
+				data, _ = js.Encode(16)
+				c.WriteMessage(websocket.BinaryMessage, data)
 
-		}
-		select {
-		case <-ticker20:
-			data, _ = js.Encode(32)
-			c.WriteMessage(websocket.BinaryMessage, data)
+			}
+			select {
+			case <-ticker20:
+				data, _ = js.Encode(32)
+				c.WriteMessage(websocket.BinaryMessage, data)
 
+			}
 		}
-	}
+	}()
+
 	for {
 		select {
 		case <-done:
